@@ -1,13 +1,23 @@
 import cors from 'cors'
+import express from 'express'
 import dotenv from 'dotenv'
 import { mongoConnect } from './mongo.js'
-import express from 'express'
+
+import { todosRouter } from './controllers/todos.js'
+import { signinRouter } from './controllers/signin.js'
+import { handleErrors } from './middleware/handleErrors.js'
 
 dotenv.config()
 mongoConnect()
 const app = express()
 app.use(cors())
 app.use(express.json())
+
+app.use('/api/todos', todosRouter)
+
+app.use('/api/signin', signinRouter)
+
+app.use(handleErrors)
 
 const PORT = process.env.PORT || 3003
 
