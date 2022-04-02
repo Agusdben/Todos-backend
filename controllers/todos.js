@@ -1,16 +1,16 @@
 import express from 'express'
 import { Todo } from '../models/Todo.js'
 import { User } from '../models/User.js'
-
+import { userExtractor } from '../middleware/userExtractor.js'
 const todosRouter = express.Router()
 
-todosRouter.get('/:userID', async (req, res) => {
+todosRouter.get('/:userID', userExtractor, async (req, res) => {
   const { userID } = req.params
   const todos = await Todo.find({ user: userID })
   res.json(todos)
 })
 
-todosRouter.post('/', async (req, res) => {
+todosRouter.post('/', userExtractor, async (req, res) => {
   const { description, important = false, username } = req.body
 
   if (!description) {
@@ -39,7 +39,7 @@ todosRouter.post('/', async (req, res) => {
   } catch (e) { console.log(e) }
 })
 
-todosRouter.put('/', async (req, res, next) => {
+todosRouter.put('/', userExtractor, async (req, res, next) => {
   const { todoID, description, important, done } = req.body
 
   const updatedTodo = {
@@ -54,8 +54,13 @@ todosRouter.put('/', async (req, res, next) => {
   } catch (e) { next(e) }
 })
 
-todosRouter.delete('/:todoID', async (req, res) => {
-
+todosRouter.delete('/', userExtractor, async (req, res, next) => {
+  const { todoID } = req.body
+  console.log('entre al delete')
+  try {
+    await Todo.findByIdAndDelete(todoID)
+    res.status(204).end()
+  } catch (e) { next(e) }
 })
 
 export { todosRouter }

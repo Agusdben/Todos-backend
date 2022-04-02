@@ -5,6 +5,7 @@ import { mongoConnect } from './mongo.js'
 
 import { todosRouter } from './controllers/todos.js'
 import { signinRouter } from './controllers/signin.js'
+import { loginRouter } from './controllers/login.js'
 import { handleErrors } from './middleware/handleErrors.js'
 
 dotenv.config()
@@ -16,6 +17,8 @@ app.use(express.json())
 app.use('/api/todos', todosRouter)
 
 app.use('/api/signin', signinRouter)
+
+app.use('/api/login', loginRouter)
 
 app.use(handleErrors)
 
