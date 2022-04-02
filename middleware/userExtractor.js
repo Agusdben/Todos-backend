@@ -8,9 +8,7 @@ export const userExtractor = (req, res, next) => {
 
   if (authorization && authorization.toLowerCase().startsWith('bearer')) {
     token = authorization.substring(7)
-    console.log('antes de la verif')
     decodedToken = jwt.verify(token, process.env.SECRET)
-    console.log({ token, decodedToken })
   }
 
   if (!token || !decodedToken._id) {

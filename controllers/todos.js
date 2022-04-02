@@ -10,7 +10,7 @@ todosRouter.get('/:userID', userExtractor, async (req, res) => {
   res.json(todos)
 })
 
-todosRouter.post('/', userExtractor, async (req, res) => {
+todosRouter.post('/', userExtractor, async (req, res, next) => {
   const { description, important = false, username } = req.body
 
   if (!description) {
@@ -36,7 +36,7 @@ todosRouter.post('/', userExtractor, async (req, res) => {
     user.todos = user.todos.concat(savedTodo._id)
     await user.save()
     res.status(200).end()
-  } catch (e) { console.log(e) }
+  } catch (e) { next(e) }
 })
 
 todosRouter.put('/', userExtractor, async (req, res, next) => {
@@ -56,7 +56,7 @@ todosRouter.put('/', userExtractor, async (req, res, next) => {
 
 todosRouter.delete('/', userExtractor, async (req, res, next) => {
   const { todoID } = req.body
-  console.log('entre al delete')
+
   try {
     await Todo.findByIdAndDelete(todoID)
     res.status(204).end()
