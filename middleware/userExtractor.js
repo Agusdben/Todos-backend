@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken'
 
 export const userExtractor = (req, res, next) => {
   const authorization = req.get('authorization')
-
   let token = null
   let decodedToken = null
 
@@ -11,7 +10,7 @@ export const userExtractor = (req, res, next) => {
     decodedToken = jwt.verify(token, process.env.SECRET)
   }
 
-  if (!token || !decodedToken._id) {
+  if (!token || !decodedToken.id) {
     return res.status(401).json({ error: 'Token missing or invalid' })
   }
 

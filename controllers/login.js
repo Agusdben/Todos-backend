@@ -5,9 +5,8 @@ import jwt from 'jsonwebtoken'
 
 const loginRouter = express.Router()
 
-loginRouter.post('/', async (req, res) => {
+loginRouter.post('/', async (req, res, next) => {
   const { username, password } = req.body
-
   if (!username) {
     return res.status(400).json({ error: 'Username required' })
   }
@@ -15,29 +14,28 @@ loginRouter.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Password required' })
   }
 
-  const user = await User.findOne({ username }).populate('todos', {
-    description: 1,
-    important: 1,
-    done: 1
-  })
-  const validPassword = user === null
-    ? false
-    : await bcrypt.compare(password, user.passwordHash)
+  try {
+    const user = await User.findOne({ username })
 
-  if (!user || !validPassword) {
-    res.status(401).json({ error: 'Invalid username or password' })
-  }
+    const validPassword = user === null
+      ? false
+      : await bcrypt.compare(password, user.passwordHash)
 
-  const userForToken = user.toJSON()
-  const token = jwt.sign(
-    userForToken,
-    process.env.SECRET,
-    {
-      expiresIn: 60 * 60 * 24 * 30
+    if (!user || !validPassword) {
+      res.status(401).json({ error: 'Invalid username or password' })
     }
-  )
 
-  res.send({ ...userForToken, token })
+    const userForToken = user.toJSON()
+    const token = jwt.sign(
+      userForToken,
+      process.env.SECRET,
+      {
+        expiresIn: 60 * 60 * 24 * 30
+      }
+    )
+
+    res.send({ ...userForToken, token })
+  } catch (e) { next(e) }
 })
 
 export { loginRouter }

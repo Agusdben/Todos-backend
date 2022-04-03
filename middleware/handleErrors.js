@@ -1,5 +1,4 @@
 export const handleErrors = (err, req, res, next) => {
-  console.log('a')
   console.log(err)
   if (err.name === 'CastError' && err.kind === 'ObjectId') {
     res.status(400).json({ error: 'Id does not exist' })

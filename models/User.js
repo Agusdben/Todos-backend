@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { setDefaultFormat } from '../helpers/schemaFormat.js'
+
 const Schema = mongoose.Schema
 const model = mongoose.model
 
@@ -19,10 +19,11 @@ const userSchema = new Schema({
   }]
 })
 
-setDefaultFormat(userSchema)
-
 userSchema.set('toJSON', {
   transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id
+    delete returnedObject._id
+    delete returnedObject.__v
     delete returnedObject.passwordHash
   }
 })
