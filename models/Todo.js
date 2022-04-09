@@ -8,10 +8,6 @@ const todoSchema = new Schema({
     type: String,
     require: true
   },
-  important: {
-    type: Boolean,
-    default: false
-  },
   done: {
     type: Boolean,
     default: false

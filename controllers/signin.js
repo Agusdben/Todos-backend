@@ -26,7 +26,7 @@ signinRouter.post('/', async (req, res, next) => {
 
   try {
     const savedUser = await newUser.save()
-    res.status(200).json(savedUser)
+    res.status(200).json(savedUser).end()
   } catch (e) { next(e) }
 })
 

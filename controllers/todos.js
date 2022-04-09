@@ -7,12 +7,11 @@ const todosRouter = express.Router()
 todosRouter.get('/:userID', userExtractor, async (req, res) => {
   const { userID } = req.params
   const todos = await Todo.find({ user: userID })
-  res.json(todos)
+  res.json(todos).end()
 })
 
 todosRouter.post('/', userExtractor, async (req, res, next) => {
-  const { description, important = false, username } = req.body
-
+  const { description, username } = req.body
   if (!description) {
     res.status(400).json({ error: 'Please complete description field' })
   }
@@ -25,7 +24,6 @@ todosRouter.post('/', userExtractor, async (req, res, next) => {
 
   const newTodo = new Todo({
     description,
-    important,
     user: user._id
   })
 
@@ -35,29 +33,41 @@ todosRouter.post('/', userExtractor, async (req, res, next) => {
     // ...and update user document with it
     user.todos = user.todos.concat(savedTodo._id)
     await user.save()
-    res.status(200).end()
+    res.json(savedTodo).end()
   } catch (e) { next(e) }
 })
 
 todosRouter.put('/', userExtractor, async (req, res, next) => {
-  const { todoID, description, important, done } = req.body
+  const { todoID, description, done } = req.body
 
   const updatedTodo = {
     description,
-    important,
     done
   }
 
   try {
     const todoUpdated = await Todo.findByIdAndUpdate(todoID, updatedTodo, { new: true })
-    res.json(todoUpdated)
+    res.json(todoUpdated).end()
   } catch (e) { next(e) }
 })
 
-todosRouter.delete('/', userExtractor, async (req, res, next) => {
-  const { todoID } = req.body
+todosRouter.delete('/:todoID', userExtractor, async (req, res, next) => {
+  const { todoID } = req.params
 
   try {
+    // find index of user todo that be deleted
+    const todo = await Todo.findById(todoID)
+    const user = await User.findById(todo.user)
+    const todosIDS = user.todos.map(todo => todo.toString())
+    const index = todosIDS.indexOf(todoID)
+    const todosUpdaete = user.todos.splice(index, 1)
+    // update user without the todo
+    const userUpdate = {
+      ...user,
+      todos: todosUpdaete
+    }
+    // finally update user and delte todo in data base
+    await User.findByIdAndUpdate(user._id, userUpdate)
     await Todo.findByIdAndDelete(todoID)
     res.status(204).end()
   } catch (e) { next(e) }
