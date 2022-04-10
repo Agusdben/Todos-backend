@@ -7,19 +7,19 @@ const todosRouter = express.Router()
 todosRouter.get('/:userID', userExtractor, async (req, res) => {
   const { userID } = req.params
   const todos = await Todo.find({ user: userID })
-  res.json(todos).end()
+  return res.json(todos).end()
 })
 
 todosRouter.post('/', userExtractor, async (req, res, next) => {
   const { description, username } = req.body
   if (!description) {
-    res.status(400).json({ error: 'Please complete description field' })
+    return res.status(400).json({ error: 'Please complete description field' })
   }
 
   const user = await User.findOne({ username })
 
   if (!user) {
-    res.status(400).json({ error: 'User does not exist' })
+    return res.status(400).json({ error: 'User does not exist' })
   }
 
   const newTodo = new Todo({
@@ -33,7 +33,7 @@ todosRouter.post('/', userExtractor, async (req, res, next) => {
     // ...and update user document with it
     user.todos = user.todos.concat(savedTodo._id)
     await user.save()
-    res.json(savedTodo).end()
+    return res.json(savedTodo).end()
   } catch (e) { next(e) }
 })
 
