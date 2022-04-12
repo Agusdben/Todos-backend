@@ -9,5 +9,8 @@ export const handleErrors = (err, req, res, next) => {
   if (err.name === 'MongoServerError') {
     const keys = Object.keys(err.keyValue)
     return res.status(409).json({ error: `${keys.map(key => key + ', ')}already taken` })
+  }
+  if (err.name === 'TokenExpiredError') {
+    return res.status(401).json({ error: 'Token expired' })
   } else return res.status(500).end()
 }
