@@ -20,7 +20,7 @@ signinRouter.post('/', async (req, res, next) => {
     const passwordHash = await bcrypt.hash(password, saltRounds)
 
     const newUser = new User({
-      username,
+      username: username.toLowerCase(),
       passwordHash,
       todos: []
     })
