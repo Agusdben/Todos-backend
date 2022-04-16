@@ -13,7 +13,7 @@ todosRouter.get('/:userID', userExtractor, async (req, res) => {
 todosRouter.post('/', userExtractor, async (req, res, next) => {
   const { description, username } = req.body
   if (!description) {
-    return res.status(400).json({ error: 'Please complete description field' })
+    return res.status(400).json({ error: 'Description missing or invalid' })
   }
 
   const user = await User.findOne({ username })
@@ -39,6 +39,10 @@ todosRouter.post('/', userExtractor, async (req, res, next) => {
 
 todosRouter.put('/', userExtractor, async (req, res, next) => {
   const { todoID, description, done } = req.body
+
+  if (!description) {
+    return res.status(400).json({ error: 'Description missing or invalid' })
+  }
 
   const updatedTodo = {
     description,
