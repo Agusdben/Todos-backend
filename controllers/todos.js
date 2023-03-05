@@ -44,6 +44,10 @@ todosRouter.put('/', userExtractor, async (req, res, next) => {
     return res.status(400).json({ error: 'Description missing or invalid' })
   }
 
+  if (done === null) {
+    return res.status(400).json({ error: 'Done missing or invalid' })
+  }
+
   const updatedTodo = {
     description,
     done
