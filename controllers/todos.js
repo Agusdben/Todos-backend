@@ -12,8 +12,13 @@ todosRouter.get('/:userID', userExtractor, async (req, res) => {
 
 todosRouter.post('/', userExtractor, async (req, res, next) => {
   const { description, username } = req.body
+
   if (!description) {
     return res.status(400).json({ error: 'Description missing or invalid' })
+  }
+
+  if (description.length > 75) {
+    return res.status(400).json({ error: 'Description invalid' })
   }
 
   const user = await User.findOne({ username })
